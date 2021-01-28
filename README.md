@@ -1,1 +1,1 @@
-# ts-react
+# summer-quiz-game
