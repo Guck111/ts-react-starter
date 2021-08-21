@@ -1,1 +1,1 @@
-export {UsersContainer} from "./UsersContainer"
+export { Users } from "./Users"

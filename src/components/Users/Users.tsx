@@ -1,76 +1,81 @@
-import React from "react";
-import styled from "@emotion/styled";
-import User from "../../assets/images/User.png";
+import { useState } from "react"
+import { useStore } from "effector-react"
+import { $users, addUserFx } from "models/users"
+import styled from "@emotion/styled"
+import tw from "twin.macro"
 
-export const Users = (props) => {
-  const pagesCount = Math.ceil(props.totalUsersCount / props.pageSize);
+type Props = {
+  title: string
+}
 
-  const pages = [];
-  for (let i = 1; i <= pagesCount; i++) {
-    pages.push(i);
-  }
+export const Users = ({ title }: Props) => {
+  const users = useStore($users)
+  const [name, setName] = useState("")
 
   return (
-    <div>
-      <div>
-        {pages.map((p) => {
-          return (
-            <SelectedPage
-              key={p.id}
-              onClick={(e) => {
-                props.onPageChanged(p);
-              }}
-            >
-              {p}
-            </SelectedPage>
-          );
-        })}
-      </div>
+    <>
+      <h1>{title}</h1>
+      <h3>Environmental variables:</h3>
+      <p>
+        process.env.PROJECT_NAME: <b>{process.env.PROJECT_NAME}</b>
+      </p>
+      <Wrap>
+        {users.map(({ name, id }) => (
+          <Row key={id}>
+            {id + 1}: {name}
+          </Row>
+        ))}
+      </Wrap>
+      <Input
+        type="text"
+        placeholder="type"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <SimpleButton
+        onClick={() => {
+          addUserFx(name)
+          setName("")
+        }}
+      >
+        Add user
+      </SimpleButton>
+    </>
+  )
+}
 
-      {props.users.map((u) => (
-        <div key={u.id}>
-          <div>
-            <Img src={u.photos.small != null ? u.photos.small : User} alt="Avatar"/>
-          </div>
+const Wrap = styled.div`
+  border: 1px solid #eee;
+`
 
-          <div>
-            {u.followed ? (
-              <button
-                onClick={() => {
-                  props.unfollow(u.id);
-                }}
-              >
-                Unfollow
-              </button>
-            ) : (
-              <button
-                onClick={() => {
-                  props.follow(u.id);
-                }}
-              >
-                Follow
-              </button>
-            )}
-          </div>
-          <div>{u.name}</div>
-          <div>{u.status}</div>
-          <div>{"u.location.country"}</div>
-          <div>{"u.location.city"}</div>
-        </div>
-      ))}
-    </div>
-  );
-};
+const Row = styled.div`
+  border-bottom: 1px solid #eee;
+  padding: 12px;
+`
 
-const Img = styled.img`
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-`;
+const Button = tw.div`
+	flex
+	inline-flex
+	items-center
+	border
+	text-xs
+	font-medium
+	rounded
+	shadow-sm
+	text-white
+	cursor-pointer
+	bg-red-600
+	hover:bg-indigo-700
+	focus:outline-none
+`
 
-const SelectedPage = styled.span`
-  padding-left: 5px;
-  &:hover {
-    cursor: pointer;
-  }
-`;
+const SimpleButton = styled(Button)`
+  padding: 12px 20px;
+`
+
+const Input = styled.input`
+  padding: 9px;
+  border: 2px solid #333;
+  border-radius: 5px;
+  margin-right: 12px;
+`

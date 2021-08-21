@@ -3,10 +3,14 @@ const fs = require('fs')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
+const Dotenv = require('dotenv-webpack')
+const { ProvidePlugin } = require("webpack")
 
 const PATHS = {
 	src: path.join(__dirname, '../src'),
 	dist: path.join(__dirname, '../dist'),
+	assets: 'assets/'
 }
 
 const PAGES_DIR = `./public/`
@@ -18,7 +22,7 @@ module.exports = {
 	},
 	entry: [`${PATHS.src}/index.tsx`],
 	output: {
-		filename: "js/[name].js",
+		filename: `${PATHS.assets}js/[name].js`,
 		path: PATHS.dist,
 		publicPath: '/'
 	},
@@ -69,20 +73,29 @@ module.exports = {
 	resolve: {
 		extensions: ['.js', '.ts', '.tsx'],
 		alias: {
-			'@redux': `${PATHS.src}/redux`
+			"components": `${PATHS.src}/components`,
+			"models": `${PATHS.src}/models`,
 		}
 	},
 	plugins: [
 		new MiniCssExtractPlugin({
 			filename: `${PATHS.assets}css/main.css`,
 		}),
-		// new CopyWebpackPlugin([
-		// 	{ from: `${PATHS.src}/${PATHS.assets}img`, to: `${PATHS.assets}img` },
-		// 	{ from: `${PATHS.src}/${PATHS.assets}fonts`, to: `${PATHS.assets}fonts` },
-		// 	{ from: `${PATHS.src}/${PATHS.assets}video`, to: `${PATHS.assets}video` },
-		// ]),
+		new CopyWebpackPlugin([
+			{ from: `${PATHS.src}/${PATHS.assets}img`, to: `${PATHS.assets}img` },
+			{ from: `${PATHS.src}/${PATHS.assets}fonts`, to: `${PATHS.assets}css` },
+		]),
 		...PAGES.map(page => new HtmlWebpackPlugin({
 			template: `${PAGES_DIR}/${page}`
-		}))
+		})),
+		new ForkTsCheckerWebpackPlugin({
+			eslint: {
+				files: "./src/**/*.{ts,tsx,js,jsx}",
+			},
+		}),
+		new Dotenv(),
+		new ProvidePlugin({
+			React: 'react'
+		})
 	],
 }

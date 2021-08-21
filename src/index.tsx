@@ -1,24 +1,19 @@
+import "./assets/reset.css"
 import "./lang/i18n"
-import React from "react"
+import "tailwindcss/dist/base.min.css"
+import { StrictMode } from "react"
 import ReactDOM from "react-dom"
 import { App } from "./App"
 import { attachLogger } from "effector-logger/attach"
 import { root } from "effector-root"
-import { Provider } from "react-redux"
-import { BrowserRouter } from "react-router-dom"
-import { store } from "@redux/store"
 
 attachLogger(root, {
-  console: "disabled",
+  console: "enabled",
 })
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </Provider>
-  </React.StrictMode>,
+  <StrictMode>
+    <App />
+  </StrictMode>,
   document.getElementById("root")
 )
